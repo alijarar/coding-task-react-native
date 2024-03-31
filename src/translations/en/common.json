@@ -2,5 +2,14 @@
   "appName": {
     "full": "React Native CodingTask",
     "initials": "RNB"
+  },
+  "login":{
+    "needHelpText":"Need Help?",
+    "needHelpSubText":"By clicking \"Login\", you agree to recieve SMS Text message from Chime to verify you identity",
+    "actionSheet":{
+      "text":"Yikes",
+      "subText":"Email and password combination do match our records",
+      "tryAgainButtonText":"Try Again"
+    }
   }
 }
