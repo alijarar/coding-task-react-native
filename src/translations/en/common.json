@@ -4,12 +4,19 @@
     "initials": "RNB"
   },
   "login":{
+    "emailPlaceholder":"Email",
+    "passwordPlaceholder":"Password",
     "needHelpText":"Need Help?",
     "needHelpSubText":"By clicking \"Login\", you agree to recieve SMS Text message from Chime to verify you identity",
     "actionSheet":{
       "text":"Yikes",
       "subText":"Email and password combination do match our records",
       "tryAgainButtonText":"Try Again"
+    },
+    "required":{
+      "emailMessage":"Email is required.",
+      "passwordMessage":"Password is required."
     }
-  }
+  },
+  "success":"Succes!"
 }
