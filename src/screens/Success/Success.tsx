@@ -4,7 +4,7 @@ import { SafeScreen } from "@/components/template";
 
 import type { ApplicationScreenProps } from "@/types/navigation";
 import { SuccessScreenWrapper } from "./styled";
-import BottomImageScreen from "../Login/BottomImage";
+import BottomImageScreen from "../../components/BottomImage";
 
 function Success({ navigation }: ApplicationScreenProps) {
   const { t } = useTranslation(["welcome", "common"]);

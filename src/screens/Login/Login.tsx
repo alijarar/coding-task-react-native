@@ -4,33 +4,24 @@ import {
   Text,
   TouchableOpacity,
   ScrollView,
-  TextInput,
   StyleSheet,
   Image,
-  Platform,
 } from "react-native";
-import i18next from "i18next";
 import { useTranslation } from "react-i18next";
 import { SafeScreen } from "@/components/template";
-import { fetchOne } from "@/services/users";
 import ActionSheet, { ActionSheetRef } from "react-native-actions-sheet";
 import {
-  ActionSheetButton,
   Container,
-  ErrorMessage,
   ImageContainer,
-  Input,
   LoginButton,
   LoginButtonText,
-  PasswordContainer,
-  PasswordInput,
-  ScrollViewContainer,
   TextWrapper,
 } from "./styled";
 import validateUserCredentials from "@/services/users/fetchOne";
 import HomeImage from "../../assets/images/homeIcon.png";
 import { useNavigation } from "@react-navigation/native";
-import BottomImageScreen from "./BottomImage";
+import BottomImageScreen from "../../components/BottomImage";
+import LoginForm from "@/components/LoginForm/LoginForm";
 
 function Login() {
   const { t } = useTranslation(["welcome", "common"]);
@@ -44,10 +35,6 @@ function Login() {
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-
-  const toggleShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
 
   const handleLogin = useCallback(async () => {
     if (!email) {
@@ -129,41 +116,30 @@ function Login() {
               <Image source={HomeImage} resizeMode="contain" />
             </ImageContainer>
             <Container>
-              <Input
-                style={[focusedField === "email" && { borderColor: "#3C7D47" }]}
-                placeholder={t("common:login.emailPlaceholder")}
-                value={email}
-                onChangeText={setEmail}
-                onFocus={() => setFocusedField("email")}
-                onBlur={() => setFocusedField(null)}
+              <LoginForm
+                email={email}
+                setEmail={(value) => {
+                  setEmail(value);
+                  if (value !== "") {
+                    setEmailError("");
+                  } else {
+                    setEmailError(t("common:login.required.emailMessage"));
+                  }
+                }}
+                password={password}
+                setPassword={(value) => {
+                  setPassword(value);
+                  if (value !== "") {
+                    setPasswordError("");
+                  } else {
+                    setPasswordError(t("common:login.required.passwordMessage"));
+                  }
+                }}
+                focusedField={focusedField}
+                setFocusedField={setFocusedField}
+                emailError={emailError}
+                passwordError={passwordError}
               />
-              {emailError ? <ErrorMessage>{emailError}</ErrorMessage> : null}
-              <PasswordContainer
-                style={[
-                  focusedField === "password" && { borderColor: "#3C7D47" },
-                ]}
-              >
-                <PasswordInput
-                  placeholder={t("common:login.passwordPlaceholder")}
-                  value={password}
-                  secureTextEntry={!showPassword}
-                  onChangeText={setPassword}
-                  onFocus={() => setFocusedField("password")}
-                  onBlur={() => setFocusedField(null)}
-                />
-                <TouchableOpacity
-                  onPress={toggleShowPassword}
-                  style={styles.eyeIcon}
-                >
-                  <Text style={{ fontSize: 12, fontWeight: "bold" }}>
-                    {showPassword ? "hide" : "show"}
-                  </Text>
-                  {/* <MaterialIcons name={showPassword ? 'visibility-off' : 'visibility'} size={24} color="black" /> */}
-                </TouchableOpacity>
-              </PasswordContainer>
-              {passwordError ? (
-                <ErrorMessage>{passwordError}</ErrorMessage>
-              ) : null}
             </Container>
             <TextWrapper
               style={{
@@ -186,6 +162,7 @@ function Login() {
           <LoginButton
             onPress={handleLogin}
             style={!email || !password ? styles.disabledButton : null}
+            disabled={!email || !password}
           >
             <LoginButtonText>Log in</LoginButtonText>
           </LoginButton>
@@ -200,10 +177,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: "center",
     backgroundColor: "white",
-  },
-  eyeIcon: {
-    position: "absolute",
-    right: 10,
   },
   disabledButton: {
     backgroundColor: "#6EE095",

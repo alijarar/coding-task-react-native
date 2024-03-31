@@ -1,72 +1,53 @@
-import { fireEvent, render, screen } from '@testing-library/react-native';
-import { MMKV } from 'react-native-mmkv';
-import { I18nextProvider } from 'react-i18next';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import React from 'react';
+import { render, fireEvent } from '@testing-library/react-native';
+import { useNavigation } from '@react-navigation/native';
+import Login from './Login';
 
-import { ThemeProvider } from '@/theme';
-import i18n from '@/translations';
+// Mocking the useNavigation hook
+jest.mock('@react-navigation/native', () => ({
+  ...jest.requireActual('@react-navigation/native'),
+  useNavigation: jest.fn(),
+}));
 
-import Example from './Login';
+describe('Login component', () => {
+  beforeEach(() => {
+    (useNavigation as jest.Mock).mockReturnValue({
+      navigate: jest.fn(),
+    });
+  });
 
-describe('Example screen should render correctly', () => {
-	let storage: MMKV;
-	const queryClient = new QueryClient({
-		defaultOptions: {
-			queries: {
-				retry: false,
-				gcTime: Infinity,
-			},
-			mutations: {
-				gcTime: Infinity,
-			},
-		},
-	});
+  it('renders without crashing', () => {
+    render(<Login />);
+  });
 
-	beforeAll(() => {
-		storage = new MMKV();
-	});
+  it('displays email input field', () => {
+    const { getByPlaceholderText } = render(<Login />);
+    const emailInput = getByPlaceholderText('Email');
+    expect(emailInput).toBeTruthy();
+  });
 
-	test('the user change the language', () => {
-		const component = (
-			<ThemeProvider storage={storage}>
-				<I18nextProvider i18n={i18n}>
-					<QueryClientProvider client={queryClient}>
-						<Example />
-					</QueryClientProvider>
-				</I18nextProvider>
-			</ThemeProvider>
-		);
+  it('displays password input field', () => {
+    const { getByPlaceholderText } = render(<Login />);
+    const passwordInput = getByPlaceholderText('Password');
+    expect(passwordInput).toBeTruthy();
+  });
 
-		render(component);
+  it('disables login button when fields are empty', () => {
+    const { getByText } = render(<Login />);
+    const loginButton = getByText('Log in');
+    expect(loginButton.props.style).toContainEqual({ backgroundColor: '#6EE095', opacity: 0.2 });
+  });
 
-		expect(i18n.language).toBe('en');
+  it('enables login button when both email and password are filled', () => {
+    const { getByPlaceholderText, getByText } = render(<Login />);
+    const emailInput = getByPlaceholderText('Email');
+    const passwordInput = getByPlaceholderText('Password');
+    const loginButton = getByText('Log in');
 
-		const button = screen.getByTestId('change-language-button');
-		expect(button).toBeDefined();
-		fireEvent.press(button);
+    fireEvent.changeText(emailInput, 'test@example.com');
+    fireEvent.changeText(passwordInput, 'password123');
 
-		expect(i18n.language).toBe('fr');
-	});
-
-	test('the user change the theme', () => {
-		const component = (
-			<ThemeProvider storage={storage}>
-				<I18nextProvider i18n={i18n}>
-					<QueryClientProvider client={queryClient}>
-						<Example />
-					</QueryClientProvider>
-				</I18nextProvider>
-			</ThemeProvider>
-		);
-
-		render(component);
-
-		expect(storage.getString('theme')).toBe('default');
-
-		const button = screen.getByTestId('change-theme-button');
-		expect(button).toBeDefined();
-		fireEvent.press(button);
-
-		expect(storage.getString('theme')).toBe('dark');
-	});
+    expect(loginButton.props.style).not.toContainEqual({ backgroundColor: '#6EE095', opacity: 0.2 });
+  });
 });
+
